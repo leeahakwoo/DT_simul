@@ -6,9 +6,14 @@ import html
 import streamlit.components.v1 as components
 import base64
 from pathlib import Path
+import streamlit as st
 
+@st.cache_data
+def image_to_base64(image_path):
+    image_bytes = Path(image_path).read_bytes()
+    return base64.b64encode(image_bytes).decode("utf-8")
 
-uploaded_bg = st.file_uploader(...)
+factory_bg = f"data:image/png;base64,{image_to_base64('DT_img.png')}"
 
 # ------------------------------------------------------------
 # Sample Data
@@ -143,14 +148,6 @@ uploaded_bg = st.file_uploader(
     type=["png", "jpg", "jpeg"],
     help="스크린샷처럼 보이게 하려면 공장 내부 또는 3D 공장 렌더링 이미지를 업로드하세요.",
 )
-
-if uploaded_bg is not None:
-    import base64
-
-    encoded = base64.b64encode(uploaded_bg.read()).decode()
-    factory_bg = f"data:image/png;base64,{encoded}"
-else:
-    factory_bg = factory_bg_url
 
 status_color = {
     "정상": "#22c55e",
