@@ -200,7 +200,7 @@ dashboard_html = f"""
 .dt-shell {{
     display: grid;
     grid-template-columns: 250px 1fr;
-    min-height: 640px;
+    min-height: 720px;
     border-radius: 10px;
     overflow: hidden;
     background: #020617;
@@ -274,40 +274,9 @@ dashboard_html = f"""
     color: #cbd5e1;
 }}
 
-.dt-gauge {{
-    margin-top: 10px;
-    height: 110px;
-    border-radius: 110px 110px 0 0;
-    background:
-        conic-gradient(from 270deg, #22d3ee 0deg, #22d3ee 108deg, rgba(255,255,255,0.12) 108deg, rgba(255,255,255,0.12) 180deg);
+.dt-main {{
     position: relative;
-    overflow: hidden;
-}}
-
-.dt-gauge::after {{
-    content: "";
-    position: absolute;
-    left: 18px;
-    right: 18px;
-    bottom: 0;
-    height: 72px;
-    background: #020617;
-    border-radius: 80px 80px 0 0;
-}}
-
-.dt-gauge-value {{
-    position: relative;
-    margin-top: -48px;
-    text-align: center;
-    font-size: 22px;
-    font-weight: 900;
-    color: white;
-    z-index: 2;
-}}
-
-.dt-main {
-    position: relative;
-    min-height: 640px;
+    min-height: 720px;
     background-image:
         linear-gradient(180deg, rgba(2,6,23,0.08), rgba(2,6,23,0.35)),
         url("{factory_bg}");
@@ -315,7 +284,8 @@ dashboard_html = f"""
     background-repeat: no-repeat;
     background-position: center;
     background-color: #020617;
-}
+}}
+
 .dt-topbar {{
     position: absolute;
     top: 0;
@@ -441,7 +411,7 @@ dashboard_html = f"""
     }}
 
     .dt-main {{
-        min-height: 720px;
+        min-height: 760px;
     }}
 
     .dt-bottom-strip {{
@@ -477,19 +447,33 @@ dashboard_html = f"""
         </div>
 
         <div class="dt-panel-title">Warehouse Capacity</div>
+
         <div class="dt-mini-grid">
-            <div class="dt-mini-card"><div class="dt-mini-num" style="color:#ef4444;">{danger_count}</div><div class="dt-mini-label">위험</div></div>
-            <div class="dt-mini-card"><div class="dt-mini-num" style="color:#facc15;">{warning_count}</div><div class="dt-mini-label">주의</div></div>
-            <div class="dt-mini-card"><div class="dt-mini-num" style="color:#22c55e;">{normal_count}</div><div class="dt-mini-label">정상</div></div>
+            <div class="dt-mini-card">
+                <div class="dt-mini-num" style="color:#ef4444;">{danger_count}</div>
+                <div class="dt-mini-label">위험</div>
+            </div>
+            <div class="dt-mini-card">
+                <div class="dt-mini-num" style="color:#facc15;">{warning_count}</div>
+                <div class="dt-mini-label">주의</div>
+            </div>
+            <div class="dt-mini-card">
+                <div class="dt-mini-num" style="color:#22c55e;">{normal_count}</div>
+                <div class="dt-mini-label">정상</div>
+            </div>
         </div>
 
         <div class="dt-panel-title">Product Yield</div>
-        <div class="dt-gauge"></div>
-        <div class="dt-gauge-value">{100 - avg_defect:.1f}%</div>
+        <div class="dt-bottom-card">
+            <div class="dt-bottom-label">Yield</div>
+            <div class="dt-bottom-value">{100 - avg_defect:.1f}%</div>
+        </div>
 
         <div class="dt-panel-title">Quality Defect Rate</div>
-        <div class="dt-gauge"></div>
-        <div class="dt-gauge-value">{avg_defect:.2f}%</div>
+        <div class="dt-bottom-card">
+            <div class="dt-bottom-label">Defect</div>
+            <div class="dt-bottom-value">{avg_defect:.2f}%</div>
+        </div>
     </div>
 
     <div class="dt-main">
@@ -553,10 +537,9 @@ dashboard_html = f"""
 
 components.html(
     dashboard_html,
-    height=720,
+    height=740,
     scrolling=False,
 )
-
 st.caption("배경 이미지를 업로드하면 해당 이미지 위에 설비 마커와 KPI가 오버레이됩니다.")
 
 # ------------------------------------------------------------
