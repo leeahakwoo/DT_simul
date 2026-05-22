@@ -4,12 +4,11 @@ import numpy as np
 from datetime import datetime, timedelta
 import html
 import streamlit.components.v1 as components
+import base64
+from pathlib import Path
 
-st.set_page_config(
-    page_title="Virtual Factory Digital Twin",
-    page_icon="🏭",
-    layout="wide",
-)
+
+uploaded_bg = st.file_uploader(...)
 
 # ------------------------------------------------------------
 # Sample Data
@@ -162,12 +161,12 @@ status_color = {
 # 이미지 위 마커 위치
 # 배경 이미지를 바꾸면 이 좌표만 조정하면 됩니다.
 machine_positions = {
-    "Press-01": (21, 68),
-    "CNC-02": (38, 57),
-    "Robot-03": (53, 63),
-    "Conveyor-04": (67, 51),
-    "Packing-05": (78, 39),
-    "Inspection-06": (32, 43),
+    "Press-01": (45, 25),
+    "CNC-02": (46, 70),
+    "Robot-03": (65, 35),
+    "Conveyor-04": (84, 20),
+    "Packing-05": (84, 50),
+    "Inspection-06": (84, 78),
 }
 
 marker_html = ""
@@ -274,17 +273,17 @@ dashboard_html = f"""
     color: #cbd5e1;
 }}
 
-.dt-main {{
+.dt-main {
     position: relative;
     min-height: 720px;
     background-image:
-        linear-gradient(180deg, rgba(2,6,23,0.08), rgba(2,6,23,0.35)),
+        linear-gradient(180deg, rgba(2,6,23,0.03), rgba(2,6,23,0.18)),
         url("{factory_bg}");
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     background-color: #020617;
-}}
+}
 
 .dt-topbar {{
     position: absolute;
