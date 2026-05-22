@@ -132,6 +132,14 @@ status_color = {
     "위험": "#e74c3c",
 }
 
+# 3D 스타일 화면에서 먼저 쓰는 KPI 값 계산
+avg_defect = filtered["defect_rate"].mean()
+total_downtime = filtered["downtime_hours"].sum()
+availability = max(0, 1 - total_downtime / selected_hours)
+performance = min(1, filtered["production_qty"].mean() / 100)
+quality = max(0, 1 - avg_defect / 100)
+oee = availability * performance * quality * 100
+
 machine_positions = {
     "Press-01": (18, 68),
     "CNC-02": (40, 48),
