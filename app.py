@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import html
+import streamlit.components.v1 as components
 
 st.set_page_config(
     page_title="Virtual Factory Digital Twin",
@@ -304,16 +305,17 @@ dashboard_html = f"""
     z-index: 2;
 }}
 
-.dt-main {{
+.dt-main {
     position: relative;
     min-height: 640px;
     background-image:
-        linear-gradient(180deg, rgba(2,6,23,0.12), rgba(2,6,23,0.55)),
+        linear-gradient(180deg, rgba(2,6,23,0.08), rgba(2,6,23,0.35)),
         url("{factory_bg}");
-    background-size: cover;
+    background-size: contain;
+    background-repeat: no-repeat;
     background-position: center;
-}}
-
+    background-color: #020617;
+}
 .dt-topbar {{
     position: absolute;
     top: 0;
@@ -549,7 +551,11 @@ dashboard_html = f"""
 </div>
 """
 
-st.markdown(dashboard_html, unsafe_allow_html=True)
+components.html(
+    dashboard_html,
+    height=720,
+    scrolling=False,
+)
 
 st.caption("배경 이미지를 업로드하면 해당 이미지 위에 설비 마커와 KPI가 오버레이됩니다.")
 
