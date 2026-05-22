@@ -116,31 +116,246 @@ col4.metric("전력 사용", f"{latest['power_kwh']} kWh")
 col5.metric("불량률", f"{latest['defect_rate']}%")
 
 # ------------------------------------------------------------
-# 4. Digital Twin Visualization
+# 4. Digital Twin Visualization - Visual Factory Control Room
 # ------------------------------------------------------------
 
 st.divider()
-st.subheader("① 가상 공장 설비 상태 맵")
+st.subheader("① 가상 공장 3D 스타일 디지털 트윈")
 
 status_df = df.sort_values("timestamp").groupby("machine").tail(1)[
     ["machine", "status", "failure_probability", "temperature", "vibration", "power_kwh"]
-]
+].reset_index(drop=True)
 
-cols = st.columns(4)
-for idx, row in status_df.reset_index(drop=True).iterrows():
-    with cols[idx]:
-        st.markdown(
-            f"""
-            <div style='border:1px solid #ddd; border-radius:14px; padding:18px; text-align:center;'>
-                <h3>{status_icon[row['status']]} {row['machine']}</h3>
-                <p><b>상태:</b> {row['status']}</p>
-                <p><b>고장확률:</b> {row['failure_probability']}%</p>
-                <p><b>온도:</b> {row['temperature']}℃</p>
-                <p><b>진동:</b> {row['vibration']} mm/s</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+status_color = {
+    "정상": "#2ecc71",
+    "주의": "#f1c40f",
+    "위험": "#e74c3c",
+}
+
+machine_positions = {
+    "Press-01": (18, 68),
+    "CNC-02": (40, 48),
+    "Robot-03": (62, 60),
+    "Conveyor-04": (78, 38),
+}
+
+marker_html = ""
+for _, row in status_df.iterrows():
+    left, top = machine_positions[row["machine"]]
+    color = status_color[row["status"]]
+    marker_html += f"""
+    <div class="machine-marker" style="left:{left}%; top:{top}%; border-color:{color}; box-shadow:0 0 18px {color};">
+        <div class="marker-dot" style="background:{color};"></div>
+        <div class="marker-label">
+            <b>{row['machine']}</b><br>
+            상태: {row['status']}<br>
+            고장확률: {row['failure_probability']}%<br>
+            온도: {row['temperature']}℃ / 진동: {row['vibration']}
+        </div>
+    </div>
+    """
+
+factory_html = f"""
+<style>
+.factory-wrap {{
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 16px;
+    margin-top: 12px;
+}}
+.left-panel {{
+    background: linear-gradient(180deg, #0c1326, #151f36);
+    color: white;
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,0.15);
+}}
+.panel-title {{
+    font-size: 15px;
+    font-weight: 700;
+    margin: 12px 0 8px 0;
+}}
+.progress-row {{
+    margin-bottom: 8px;
+}}
+.progress-label {{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    margin-bottom:3px;
+}}
+.progress-bg {{
+    height: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.15);
+}}
+.progress-bar {{
+    height: 14px;
+    border-radius: 8px;
+}}
+.gauge-card {{
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+}}
+.factory-scene {{
+    position: relative;
+    height: 520px;
+    overflow: hidden;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background:
+        linear-gradient(180deg, rgba(10,18,35,0.1), rgba(10,18,35,0.55)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 2px, transparent 2px 90px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 70px),
+        linear-gradient(135deg, #27384f 0%, #6f7d88 45%, #1f2838 100%);
+}}
+.ceiling {{
+    position:absolute;
+    top:0; left:0; right:0;
+    height:100px;
+    background: repeating-linear-gradient(110deg, rgba(255,255,255,0.18) 0 7px, transparent 7px 42px);
+    opacity:0.45;
+}}
+.floor {{
+    position:absolute;
+    left:-5%; right:-5%; bottom:-20px;
+    height:330px;
+    background: linear-gradient(160deg, #212a35, #48515c);
+    transform: skewY(-8deg);
+    border-top: 4px solid rgba(255,255,255,0.2);
+}}
+.line {{
+    position:absolute;
+    height: 14px;
+    background: #f1c40f;
+    opacity:0.9;
+    transform: rotate(-8deg);
+    border-radius:8px;
+}}
+.line.a {{ left: 10%; top: 74%; width: 80%; }}
+.line.b {{ left: 25%; top: 55%; width: 60%; }}
+.machine-box {{
+    position:absolute;
+    width:95px;
+    height:62px;
+    background: linear-gradient(145deg, #e8edf4, #9aa7b4);
+    border: 1px solid #dbe4ef;
+    border-radius: 8px;
+    box-shadow: 14px 18px 22px rgba(0,0,0,0.35);
+    transform: skewY(-8deg);
+}}
+.machine-box::after {{
+    content:"";
+    position:absolute;
+    right:-20px; top:10px;
+    width:20px; height:52px;
+    background:#778391;
+    transform: skewY(30deg);
+    border-radius: 0 6px 6px 0;
+}}
+.machine-marker {{
+    position:absolute;
+    width: 38px;
+    height: 38px;
+    margin-left:-19px;
+    margin-top:-19px;
+    border: 3px solid;
+    border-radius: 50%;
+    background: rgba(9,18,32,0.72);
+    z-index:5;
+}}
+.marker-dot {{
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin: 8px auto;
+}}
+.marker-label {{
+    display:none;
+    position:absolute;
+    left:44px;
+    top:-20px;
+    width: 210px;
+    background: rgba(8,14,28,0.94);
+    color:white;
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 12px;
+    line-height:1.45;
+    border: 1px solid rgba(255,255,255,0.2);
+}}
+.machine-marker:hover .marker-label {{
+    display:block;
+}}
+.top-kpis {{
+    position:absolute;
+    top:16px; left:20px; right:20px;
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    z-index:4;
+}}
+.kpi-pill {{
+    background: rgba(4,10,22,0.78);
+    color:white;
+    border:1px solid rgba(0,234,255,0.35);
+    border-radius: 14px;
+    padding: 12px;
+    text-align:center;
+}}
+.kpi-pill .num {{
+    font-size: 24px;
+    font-weight:800;
+}}
+</style>
+
+<div class="factory-wrap">
+  <div class="left-panel">
+    <div class="panel-title">Production / Target</div>
+    <div class="progress-row"><div class="progress-label"><span>Assembly Shop1</span><b>88%</b></div><div class="progress-bg"><div class="progress-bar" style="width:88%; background:#13c2c2;"></div></div></div>
+    <div class="progress-row"><div class="progress-label"><span>Assembly Shop2</span><b>72%</b></div><div class="progress-bg"><div class="progress-bar" style="width:72%; background:#e74c3c;"></div></div></div>
+    <div class="progress-row"><div class="progress-label"><span>Processing Shop</span><b>84%</b></div><div class="progress-bg"><div class="progress-bar" style="width:84%; background:#3498db;"></div></div></div>
+    <div class="progress-row"><div class="progress-label"><span>Part Shop</span><b>61%</b></div><div class="progress-bg"><div class="progress-bar" style="width:61%; background:#f1c40f;"></div></div></div>
+
+    <div class="panel-title">Warehouse Capacity</div>
+    <div class="gauge-card">🚨 위험 설비: {len(status_df[status_df['status']=='위험'])} EA</div>
+    <div class="gauge-card">⚠️ 주의 설비: {len(status_df[status_df['status']=='주의'])} EA</div>
+    <div class="gauge-card">✅ 정상 설비: {len(status_df[status_df['status']=='정상'])} EA</div>
+
+    <div class="panel-title">Product Yield</div>
+    <div class="gauge-card">수율: {100 - avg_defect:.1f}%</div>
+    <div class="gauge-card">불량률: {avg_defect:.1f}%</div>
+  </div>
+
+  <div class="factory-scene">
+    <div class="ceiling"></div>
+    <div class="floor"></div>
+    <div class="line a"></div>
+    <div class="line b"></div>
+    <div class="top-kpis">
+      <div class="kpi-pill"><div>FACILITY</div><div class="num">{oee:.1f}%</div></div>
+      <div class="kpi-pill"><div>CONVEYOR</div><div class="num">{status_df['failure_probability'].mean():.1f}%</div></div>
+      <div class="kpi-pill"><div>AGV</div><div class="num">84.0%</div></div>
+      <div class="kpi-pill"><div>WORKER</div><div class="num">99.2%</div></div>
+    </div>
+    <div class="machine-box" style="left:12%; top:64%;"></div>
+    <div class="machine-box" style="left:26%; top:58%;"></div>
+    <div class="machine-box" style="left:40%; top:50%;"></div>
+    <div class="machine-box" style="left:56%; top:55%;"></div>
+    <div class="machine-box" style="left:70%; top:45%;"></div>
+    <div class="machine-box" style="left:80%; top:62%;"></div>
+    {marker_html}
+  </div>
+</div>
+"""
+
+st.markdown(factory_html, unsafe_allow_html=True)
+st.caption("마커에 마우스를 올리면 설비별 센서 상태와 고장확률을 확인할 수 있습니다.")
 
 # ------------------------------------------------------------
 # 5. Sensor Trend Charts
@@ -312,4 +527,3 @@ st.caption("※ 본 데이터와 수치는 대학원 과제용 가상 시뮬레�
 # pandas
 # numpy
 # matplotlib
-
