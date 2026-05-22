@@ -6,7 +6,12 @@ import html
 import streamlit.components.v1 as components
 import base64
 from pathlib import Path
-import streamlit as st
+
+st.set_page_config(
+    page_title="Virtual Factory Digital Twin",
+    page_icon="🏭",
+    layout="wide",
+)
 
 @st.cache_data
 def image_to_base64(image_path):
@@ -138,17 +143,6 @@ c5.metric("불량률", f"{latest['defect_rate']}%")
 st.divider()
 st.subheader("① 가상 공장 디지털 트윈 관제 화면")
 
-# 방법 1: 온라인 이미지 URL 사용
-# 원하는 공장 이미지 URL로 교체 가능
-factory_bg_url = "https://images.unsplash.com/photo-1581093458791-9d42cc81a6d5?auto=format&fit=crop&w=1600&q=80"
-
-# 방법 2: 직접 업로드한 이미지 사용
-uploaded_bg = st.file_uploader(
-    "공장 배경 이미지 업로드",
-    type=["png", "jpg", "jpeg"],
-    help="스크린샷처럼 보이게 하려면 공장 내부 또는 3D 공장 렌더링 이미지를 업로드하세요.",
-)
-
 status_color = {
     "정상": "#22c55e",
     "주의": "#facc15",
@@ -270,7 +264,7 @@ dashboard_html = f"""
     color: #cbd5e1;
 }}
 
-.dt-main {
+.dt-main {{
     position: relative;
     min-height: 720px;
     background-image:
@@ -280,7 +274,7 @@ dashboard_html = f"""
     background-repeat: no-repeat;
     background-position: center;
     background-color: #020617;
-}
+}}
 
 .dt-topbar {{
     position: absolute;
@@ -536,7 +530,7 @@ components.html(
     height=740,
     scrolling=False,
 )
-st.caption("배경 이미지를 업로드하면 해당 이미지 위에 설비 마커와 KPI가 오버레이됩니다.")
+st.caption("내장된 DT_img.png 이미지 위에 설비 마커와 KPI가 오버레이됩니다.")
 
 # ------------------------------------------------------------
 # Table
